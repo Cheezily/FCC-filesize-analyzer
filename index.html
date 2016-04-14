@@ -1,14 +1,42 @@
 <!doctype html>
 <html>
 <head>
+  <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
 </head>
 
 <body>
   <p>Please choose a file to upload.<p>
-  <form method="post" action="/upload" enctype="multipart/form-data">
-    <input name='data' type='file' value="Choose File" required>
+  <form method="post" action="/upload" enctype="multipart/form-data" id='theForm'>
+    <input name='data' type='file' id='fileField' value="Choose File" required>
     <input type='submit'>
   </form>
 
+<script type="text/javascript">
+
+  var theForm = document.getElementById('theForm');
+
+  theForm.onsubmit = function(e) {
+    e.preventDefault();
+
+    var fileField = document.getElementById('fileField');
+
+    var data = new FormData(fileField);
+    data.append("myFile", fileField.files[0]);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", '/upload');
+    xhr.send(data);
+
+    xhr.onreadystatechange = function() {
+      //wait for full readystate change. Was duplicating data before.
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        var response = JSON.parse(xhr.responseText);
+        alert(response['fileSize']);
+      }
+    }
+
+  }
+
+</script>
 </body>
 </html>

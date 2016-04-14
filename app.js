@@ -25,6 +25,7 @@ function startSerer(html) {
         res.end();
         return;
       }
+
       res.writeHead('200', {'Content-Type': 'text/html'});
       res.write(html);
       res.end();
@@ -32,14 +33,18 @@ function startSerer(html) {
 
 
     if (req.method == "POST" && url == '/upload') {
+
       form.parse(req, function(err, fields, files) {
-        console.log(files);
+
+        //field conatining the file is called myFile
         if (files) {
-          returnSize(req, res, files)
+          returnSize(req, res, files.myFile[0].size.toString());
         } else {
-          res.end('Error uploading file. Please try again.')
+          returnSize(req, res, "Error. Please refresh the page.")
         }
+
       });
+
     }
   });
 
@@ -50,13 +55,10 @@ function startSerer(html) {
 }
 
 
-function returnSize(req, res, files) {
+function returnSize(req, res, data) {
 
-  var size = files.data[0].size;
-  res.writeHead(200, {'content-type': 'text/html'});
-  res.end(
-    "<html><head></head><body>" +
-    "<script>alert('File Size: " + size.toString() + "');</script>" +
-    "</body></html>"
-  );
+  var output = { "fileSize": data };
+  res.writeHead(200, {"Content-Type": "application/json"});
+  res.write(JSON.stringify(output));
+  res.end();
 }
